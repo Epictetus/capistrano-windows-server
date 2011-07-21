@@ -1,0 +1,20 @@
+= capistrano-windows-server
+
+Deploy Ruby on Rails applications with Capistrano to Windows servers
+
+This gem modifies capistrano recipes to allow deploys to windows machines.
+Several nuances such as the lack of symlinks make the deploy a little different, but it's better than doing it by hand.
+See the github page for instruction on how to set up Windows to get it ready for a deploy.
+
+== Contributing to capistrano-windows-server
+ 
+* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
+* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
+* Fork the project
+* Start a feature/bugfix branch
+* Commit and push until you are happy with your contribution
+* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
+
+== Copyright
+
+Copyright (c) 2011 SciMed Solutions, Inc. See LICENSE.txt for further details.  
