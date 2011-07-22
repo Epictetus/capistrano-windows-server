@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{capistrano-windows-server}
-  s.version = "0.1.0"
+  s.version = "0.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Edward Anderson"]
@@ -16,17 +16,18 @@ See the github page for instruction on how to set up Windows to get it ready for
   s.email = %q{edward.anderson@scimedsolutions.com}
   s.extra_rdoc_files = [
     "LICENSE.txt",
-    "README.rdoc"
+    "README.md"
   ]
   s.files = [
     ".document",
     "Gemfile",
     "Gemfile.lock",
     "LICENSE.txt",
-    "README.rdoc",
+    "README.md",
     "Rakefile",
     "VERSION",
-    "lib/capistrano/windows_server.rb"
+    "capistrano-windows-server.gemspec",
+    "lib/capistrano/ext/windows_server.rb"
   ]
   s.homepage = %q{http://github.com/nilbus/capistrano-windows-server}
   s.licenses = ["MIT"]
