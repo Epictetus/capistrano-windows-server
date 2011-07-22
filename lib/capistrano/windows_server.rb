@@ -12,15 +12,16 @@ configuration.load do
   set :use_sudo, false
 
   namespace :deploy do
-    desc "Custom for Windows - no releases; just update git in place"
+    desc "Update the code on the server by doing a git pull in the current/ directory"
     task :update do
-      # update_repository_cache will attempt to clean out the repository; we must prevent that with this deploy method.
+      # update_repository_cache will attempt to clean out the repository; we must prevent that.
       # /bin/git below is where www.windowsgit.com's windows git/ssh installation puts the git executable.
+      # This creates a git proxy that goes in $PATH before /bin, which will filter out any `git clean` commands.
       run "mkdir -p '#{shared_path}/bin'"
       run <<-RUN
         echo 'if [ "$1" != "clean" ]; then /bin/git $*; fi' > "#{shared_path}/bin/git.exe"
       RUN
-      alter_path_cmd = "export PATH=#{shared_path}/bin:$PATH"
+      alter_path_cmd = "export PATH=#{shared_path}/bin:$PATH # Required for capistrano-windows-server"
       run <<-RUN
         if ! grep '#{alter_path_cmd}' ~/.bashrc > /dev/null; then echo '#{alter_path_cmd}' >> ~/.bashrc; fi
       RUN
@@ -28,7 +29,7 @@ configuration.load do
       strategy.send 'update_repository_cache'
     end
 
-    desc "On windows, this is an alias for update"
+    desc "An alias for deploy:update"
     task :update_code do
       update
     end
@@ -60,27 +61,27 @@ configuration.load do
     # Do nothing for Windows
     task :symlink do; end
 
-    desc "Run migrations"
+    desc "Run pending migrations"
     task :migrate do
       set :rake_cmd, "#{ruby_exe_path} -e \"require 'rubygems'; gem 'rake', '>= 0'; load Gem.bin_path('rake', 'rake', '>= 0')\""
       run "cd #{current_path} && #{rake_cmd} db:migrate RAILS_ENV=#{rails_env}"
     end
 
-    desc "start mongrel"
+    desc "Start mongrel"
     task :start do
       mongrel_instances.each do |n|
         run "net start #{mongrel_instance_prefix}#{n}"
       end
     end
 
-    desc "stop mongrel"
+    desc "Stop mongrel"
     task :stop do
       mongrel_instances.each do |n|
         run "net stop #{mongrel_instance_prefix}#{n}"
       end
     end
 
-    desc "restart mongrel"
+    desc "Restart mongrel"
     task :restart do
       mongrel_instances.each do |n|
         run "net stop #{mongrel_instance_prefix}#{n}"
@@ -89,7 +90,7 @@ configuration.load do
     end
 
     namespace :mongrel do
-      desc "create mongrel services"
+      desc "Create mongrel services"
       task :setup do
         mongrel_instances.each do |n|
           run "cd #{current_path} && #{mongrel_cmd} service::install -e #{rails_env} -N #{mongrel_instance_prefix}#{n} -p #{base_port + n - mongrel_instances.first}"
@@ -97,7 +98,7 @@ configuration.load do
         end
       end
 
-      desc "remove mongrel services"
+      desc "Remove mongrel services"
       task :remove do
         set :mongrel_cmd, "#{ruby_exe_path} -e \"require 'rubygems'; gem 'mongrel', '>= 0'; load Gem.bin_path('mongrel', 'mongrel_rails', '>= 0')\""
         mongrel_instances.each do |n|
