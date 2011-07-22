@@ -30,6 +30,7 @@ This gem assumes you are working with the following application stack, but you c
 * Mongrel instances proxied behind another web server (Apache + Passenger, nginx)
 * Git code repository
 
+
 Setting up the Windows server
 -----------------------------
 
@@ -95,7 +96,7 @@ Set up your config/deploy.rb:
 
 There are a few configuration values that need to be set in your deploy.rb, in addition to your base application configuration.
 
-    require 'capistrano/windows_server'
+    require 'capistrano/ext/windows_server'
 
     set :rails_env, 'production'
     set :user, 'git'
@@ -108,7 +109,7 @@ There are a few configuration values that need to be set in your deploy.rb, in a
 
 Your final config/deploy.rb might look something like this:
 
-    require 'capistrano/windows_server'
+    require 'capistrano/ext/windows_server'
 
     set :application, "windowsy"
     set :repository, "git@github.com:you/windowsy_rails_app.git"
@@ -179,6 +180,7 @@ If your project uses submodules, there are a few ways you can deal with this.
   If you go this route, please document the process on [this issue](https://github.com/SciMed/capistrano-windows-server/issues/1),
   so we can update this documentation.
 
+
 Which cap tasks are available?
 ------------------------------
 
@@ -229,6 +231,7 @@ We would love if you contribute back changes that you make to make it work for y
 * Fork the project
 * Start a feature/bugfix branch
 * Commit and push until you are happy with your contribution
+
 
 Copyright
 ---------
