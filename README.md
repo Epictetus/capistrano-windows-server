@@ -27,7 +27,7 @@ Windows filesystems do not support symlinks, and files cannot be moved or delete
 This gem assumes you are working with the following application stack, but you can modify it to meet your needs.
 
 * Ruby on Rails application
-* Mongrel
+* Mongrel instances proxied behind another web server (Apache + Passenger, nginx)
 * Git code repository
 
 Setting up the Windows server
@@ -38,41 +38,41 @@ These instruction are for Windows Server 2003. For other versions, YMMV.
 Administrative access is required.
 
 * Disable User Access Control. We'll re-enable this later. Reboot if necessary.
-  
+  <br><br>
   *Control Panel > Users > Notify never*
   
-* Purchase and install WindowsGit from www.windowsgit.com ($9). 
-
+* Purchase and install WindowsGit from www.windowsgit.com ($9).
+  <br><br>
   Yes, you should buy this. I wasted hours trying to get msysgit and COPSSH to work together.
   If your time is worth more than $3/hr, then this is well worth your money.
   
 * WindowsGit creates a git user. Make the git user an administrator. This is required, or you will run into
   [this problem](http://stackoverflow.com/questions/4516111/stack-trace-sshd-exe-fatal-error-could-not-load-u-win32-error-1114-copss/4518324).
-  
+  <br><br>
   *Administrative Tools > Computer Management > System Tools > Local Users and Groups > Users > git's properties > Member Of > Add "Administrators"*
   
 * Open the COPSSH Control Panel
-  
+  <br><br>
   *Start Menu > Programs > Copssh > 01 COPSSH Control Panel*
   
 * Active the git user for SSH
-  
+  <br><br>
   *Users > Add*
   
 * *Recommended:* Disallow password authentication, and use SSH key-based authentication
 
 * Import your developers/deployers' public SSH keys
-  
+  <br><br>
   *Keys > Import: Paste in public keys; import one at a time.*
   
 * Re-enable User Access Control
-  
+  <br><br>
   *Control Panel > Users >* (restore previous value)
 
 Now that COPSSH is up and running, ensure that you can SSH into the server as the git user. If you have problems, check the COPSSH event log under the Status tab. Make sure $HOME/.ssh/authorized_keys contains the keys you added.
 
 If you haven't already, set up Ruby and install any gems needed for your application, plus mongrel.
-The capistrano recipes in this gem create mongrel services to run your app.
+The capistrano recipes in this gem create mongrel Windows services to run your app.
 You can use Apache or your web server of choice to proxy for your mongrel instances.
 
 
@@ -87,7 +87,7 @@ Setting up capistrano for your Rails project
 
     config.gem "capistrano-windows-server", :lib => "capistrano"
 
-**Set up capistrano** as you normally would.
+Set up capistrano as you normally would.
 The [capistrano wiki](https://github.com/capistrano/capistrano/wiki/2.x-From-The-Beginning) and 
 [capistrano handbook](https://github.com/leehambley/capistrano-handbook/blob/master/index.markdown) are helpful.
 
@@ -137,7 +137,9 @@ Your final config/deploy.rb might look something like this:
 Cleaning up the server before the initial deploy
 ------------------------------------------------
 
-If you already have mongrel services installed for your app, remove them. If not, skip this step.
+If you don't already have mongrel Windows services installed for your app, skip this step.
+
+`cap deploy:setup` will create new mongrel Windows services based on the new app location, so you'll need to remove the existing ones.
 
 If you're using the same naming scheme as you have configured in deploy.rb (in our example, mongrel_1 to 3),
 then use the deploy:mongrel:remove recipe to remove the services.
@@ -153,7 +155,7 @@ The initial deploy
 ------------------
 
 The deploy:setup recipe is a little different for Windows.
-In addition to creating the directory structure, it clones your project into #{deploy_to}/current and installs the mongrel services.
+In addition to creating the directory structure, it clones your project into #{deploy_to}/current and installs the mongrel Windows services.
 
     cap deploy:setup
 
@@ -168,13 +170,53 @@ Once it's ready, you can deploy your app for the first time:
 ### Submodules
 
 Unfortunately, WindowsGit [does not currently support submodules](https://github.com/SciMed/capistrano-windows-server/issues/1).
+
 If your project uses submodules, there are a few ways you can deal with this.
 
 * Do it by hand - manually clone each submodule after your initial deploy
 * Install another git distribution (msysgit, PortableGit), and run git submodule init/update in your project directory
 * Pull the missing files out of another git distribution (msysgit, PortableGit) and copy them to C:\Program Files\ICW\bin .
-  If you go this route, please document the process on [this issue](https://github.com/SciMed/capistrano-windows-server/issues/1)
+  If you go this route, please document the process on [this issue](https://github.com/SciMed/capistrano-windows-server/issues/1),
   so we can update this documentation.
+
+Which cap tasks are available?
+------------------------------
+
+As usual, you can use `cap -T` for a full list of capistrano tasks.
+
+The following default capistrano tasks are supported:
+
+* `cap deploy` - Updates the code on the server (essentially just a git pull in the current/ directory)
+* `cap deploy:cold` - Deploy and start the server
+* `cap deploy:start` `cap deploy:stop` `cap deploy:restart` - Stop and start the mongrel services
+* `cap deploy:migrate` - Run migrations
+* `cap deploy:migrations` - Deploy and run migrations
+* `cap deploy:update` - Updates the code without restarting the server
+* `cap deploy:update_code` - Now an alias for deploy:update
+* `cap deploy:upload` - Upload files to the server
+* `cap invoke` - Run a command on the server specified by COMMAND
+* `cap shell` - Open a Begin an interactive Capistrano session
+
+The following new tasks were added:
+
+* `cap deploy:mongrel:setup` - Create mongrel services
+* `cap deploy:mongrel:remove` - Remove mongrel services
+* `cap rake` - Run a rake task, specified by COMMAND. eg: cap rake COMMAND="gems:install"
+
+The following tasks will later be fixed:
+
+* `cap deploy:check`
+* `cap deploy:pending`
+* `cap deploy:pending:diff`
+* `cap deploy:web:enable`
+* `cap deploy:web:disable`
+
+The following tasks were removed:
+
+* `cap deploy:cleanup`
+* `cap deploy:rollback`
+* `cap deploy:symlink`
+
 
 Contributing to capistrano-windows-server
 -----------------------------------------

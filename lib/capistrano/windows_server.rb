@@ -109,11 +109,11 @@ configuration.load do
 
   end
 
-  desc "Run a rake command in CMD"
+  desc "Run a rake command in COMMAND"
   task :rake do
-    raise "Specify the command with CMD='some:task with_arguments'" unless ENV['CMD']
+    raise "Specify the command with COMMAND='some:task with_arguments'" unless ENV['COMMAND']
     set :rake_cmd, "#{ruby_exe_path} -e \"require 'rubygems'; gem 'rake', '>= 0'; load Gem.bin_path('rake', 'rake', '>= 0')\""
-    run "cd #{current_path} && #{rake_cmd} #{ENV['CMD']} RAILS_ENV=#{rails_env}"
+    run "cd #{current_path} && #{rake_cmd} #{ENV['COMMAND']} RAILS_ENV=#{rails_env}"
   end
 
   after 'deploy:setup', 'deploy:update_code'
