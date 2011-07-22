@@ -55,11 +55,15 @@ configuration.load do
       end
     end
 
-    # Do nothing for Windows
-    task :finalize_update do; end
-
-    # Do nothing for Windows
-    task :symlink do; end
+    # Remove tasks that are not appropriate on Windows
+    %w(finalize_update symlink cleanup).each do |removed_task|
+      task removed_task do; end
+    end
+    namespace :rollback do
+      %w(code default).each do |removed_task|
+        task removed_task do; end
+      end
+    end
 
     desc "Run pending migrations"
     task :migrate do
