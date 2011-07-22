@@ -5,7 +5,7 @@ configuration = Capistrano::Configuration.respond_to?(:instance) ?
 configuration.load do
   set :scm, :git
   set :deploy_via, :remote_cache
-  set :git_enable_submodules, false # Git submodules not supported on windows
+  #set :git_enable_submodules, false # Git submodules not supported on windows
   set :shared_dir, "."
   set :repository_cache, "current"
   set :scm_verbose, true
