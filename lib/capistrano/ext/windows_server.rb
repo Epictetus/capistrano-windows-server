@@ -11,6 +11,16 @@ configuration.load do
   set :scm_verbose, true
   set :use_sudo, false
 
+  # We can't run rake directly, because the rake script searches for ruby based on windows paths that aren't valid in this environment
+  def rake_cmd
+    "#{ruby_exe_path} -e \"require 'rubygems'; gem 'rake', '>= 0'; load Gem.bin_path('rake', 'rake', '>= 0')\""
+  end
+  
+  # We can't run mongrel directly, because the mongrel script searches for ruby based on windows paths that aren't valid in this environment
+  def mongrel_cmd
+    "#{ruby_exe_path} -e \"require 'rubygems'; gem 'mongrel', '>= 0'; load Gem.bin_path('mongrel', 'mongrel_rails', '>= 0')\""
+  end
+
   namespace :deploy do
     desc "Update the code on the server by doing a git pull in the current/ directory"
     task :update do
@@ -67,7 +77,6 @@ configuration.load do
 
     desc "Run pending migrations"
     task :migrate do
-      set :rake_cmd, "#{ruby_exe_path} -e \"require 'rubygems'; gem 'rake', '>= 0'; load Gem.bin_path('rake', 'rake', '>= 0')\""
       run "cd #{current_path} && #{rake_cmd} db:migrate RAILS_ENV=#{rails_env}"
     end
 
@@ -104,7 +113,6 @@ configuration.load do
 
       desc "Remove mongrel services"
       task :remove do
-        set :mongrel_cmd, "#{ruby_exe_path} -e \"require 'rubygems'; gem 'mongrel', '>= 0'; load Gem.bin_path('mongrel', 'mongrel_rails', '>= 0')\""
         mongrel_instances.each do |n|
           run "#{mongrel_cmd} service::remove -N #{mongrel_instance_prefix}#{n}"
         end
@@ -117,7 +125,6 @@ configuration.load do
   desc "Run a rake command in COMMAND"
   task :rake do
     raise "Specify the command with COMMAND='some:task with_arguments'" unless ENV['COMMAND']
-    set :rake_cmd, "#{ruby_exe_path} -e \"require 'rubygems'; gem 'rake', '>= 0'; load Gem.bin_path('rake', 'rake', '>= 0')\""
     run "cd #{current_path} && #{rake_cmd} #{ENV['COMMAND']} RAILS_ENV=#{rails_env}"
   end
 
