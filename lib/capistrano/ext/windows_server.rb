@@ -1,3 +1,4 @@
+# Capistrano 1 and 2 have different configuration locations
 configuration = Capistrano::Configuration.respond_to?(:instance) ?
   Capistrano::Configuration.instance(:must_exist) :
   Capistrano.configuration(:must_exist)

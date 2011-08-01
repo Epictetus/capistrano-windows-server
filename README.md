@@ -88,7 +88,7 @@ Setting up capistrano for your Rails project
 
     config.gem "capistrano-windows-server", :lib => "capistrano"
 
-Set up capistrano as you normally would.
+Set up capistrano as you normally would with `capify`.
 The [capistrano wiki](https://github.com/capistrano/capistrano/wiki/2.x-From-The-Beginning) and 
 [capistrano handbook](https://github.com/leehambley/capistrano-handbook/blob/master/index.markdown) are helpful.
 
