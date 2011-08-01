@@ -107,6 +107,7 @@ configuration.load do
       desc "Create mongrel services"
       task :setup do
         mongrel_instances.each do |n|
+          run "mkdir -p #{current_path}/{tmp,log}" # These are often not under version control, but their absence keeps mongrel from recognizing the rails app
           run "cd #{current_path} && #{mongrel_cmd} service::install -e #{rails_env} -N #{mongrel_instance_prefix}#{n} -p #{base_port + n - mongrel_instances.first}"
           run %Q(sc.exe config "#{mongrel_instance_prefix}#{n}" start= auto)
         end

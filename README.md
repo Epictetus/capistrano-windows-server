@@ -161,7 +161,7 @@ In addition to creating the directory structure, it clones your project into #{d
     cap deploy:setup
 
 After `cap deploy:setup` runs successfully, it's time to set up the Rails application.
-Create or copy in config/database.yml, set up the database server, install gems, and anything else you need to do to make the app run.
+Create or copy in **config/database.yml**, set up the **database**, **install gems**, and anything else you need to do to make the app run.
 Testing to make sure the app will start with `rails script/server -e production` is a good idea.
 
 Once it's ready, you can deploy your app for the first time:
